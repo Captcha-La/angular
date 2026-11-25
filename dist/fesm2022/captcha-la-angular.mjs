@@ -1,5 +1,5 @@
 import * as i0 from '@angular/core';
-import { EventEmitter, PLATFORM_ID, Component, ChangeDetectionStrategy, Inject, Input, Output, signal, Injectable, inject, DestroyRef } from '@angular/core';
+import { EventEmitter, PLATFORM_ID, Component, ChangeDetectionStrategy, Inject, Input, Output, ViewChild, signal, Injectable, inject, DestroyRef } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 /**
@@ -135,12 +135,11 @@ function hasListeners(emitter) {
  * <captchala appKey="your-app-key" (success)="onSuccess($event)" (error)="onError($event)" />
  * ```
  *
- * The host element is the mount point. Nothing is rendered on the server; the SDK
+ * Nothing but an empty container is rendered on the server; the SDK
  * is loaded from the CDN when the component first renders in the browser.
  */
 class CaptchalaComponent {
-    constructor(host, zone, platformId) {
-        this.host = host;
+    constructor(zone, platformId) {
         this.zone = zone;
         /** Display mode. */
         this.product = 'popup';
@@ -241,7 +240,7 @@ class CaptchalaComponent {
             if (this.destroyed || seq !== this.initSeq)
                 return;
             const Captchala = window.Captchala;
-            const el = this.host.nativeElement;
+            const el = this.mount?.nativeElement;
             if (!Captchala || !el)
                 return;
             this.zone.runOutsideAngular(() => {
@@ -282,16 +281,16 @@ class CaptchalaComponent {
                 this.emit(this.error, err);
         }
     }
-    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.2.12", ngImport: i0, type: CaptchalaComponent, deps: [{ token: i0.ElementRef }, { token: i0.NgZone }, { token: PLATFORM_ID }], target: i0.ɵɵFactoryTarget.Component }); }
-    static { this.ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "16.2.12", type: CaptchalaComponent, isStandalone: true, selector: "captchala", inputs: { appKey: "appKey", product: "product", action: "action", lang: "lang", bindTo: "bindTo", serverToken: "serverToken", onServerTokenExpired: "onServerTokenExpired", theme: "theme" }, outputs: { success: "success", expired: "expired", error: "error", close: "close", ready: "ready" }, host: { properties: { "class.captchala-container--bind": "product === 'bind'" }, classAttribute: "captchala-container" }, usesOnChanges: true, ngImport: i0, template: '', isInline: true, styles: [":host{display:block;min-height:50px}\n", ":host(.captchala-container--bind){min-height:0;position:absolute;width:0;height:0;overflow:hidden}\n"], changeDetection: i0.ChangeDetectionStrategy.OnPush }); }
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.2.12", ngImport: i0, type: CaptchalaComponent, deps: [{ token: i0.NgZone }, { token: PLATFORM_ID }], target: i0.ɵɵFactoryTarget.Component }); }
+    static { this.ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "16.2.12", type: CaptchalaComponent, isStandalone: true, selector: "captchala", inputs: { appKey: "appKey", product: "product", action: "action", lang: "lang", bindTo: "bindTo", serverToken: "serverToken", onServerTokenExpired: "onServerTokenExpired", theme: "theme" }, outputs: { success: "success", expired: "expired", error: "error", close: "close", ready: "ready" }, host: { properties: { "class.captchala-container--bind": "product === 'bind'" }, classAttribute: "captchala-container" }, viewQueries: [{ propertyName: "mount", first: true, predicate: ["mount"], descendants: true, static: true }], usesOnChanges: true, ngImport: i0, template: '<div #mount class="captchala-mount"></div>', isInline: true, styles: [":host{display:block;min-height:50px}\n", ".captchala-mount{width:100%}\n", ":host(.captchala-container--bind){min-height:0;position:absolute;width:0;height:0;overflow:hidden}\n"], changeDetection: i0.ChangeDetectionStrategy.OnPush }); }
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.2.12", ngImport: i0, type: CaptchalaComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'captchala', standalone: true, template: '', changeDetection: ChangeDetectionStrategy.OnPush, host: {
+            args: [{ selector: 'captchala', standalone: true, template: '<div #mount class="captchala-mount"></div>', changeDetection: ChangeDetectionStrategy.OnPush, host: {
                         class: 'captchala-container',
                         '[class.captchala-container--bind]': "product === 'bind'"
-                    }, styles: [":host{display:block;min-height:50px}\n", ":host(.captchala-container--bind){min-height:0;position:absolute;width:0;height:0;overflow:hidden}\n"] }]
-        }], ctorParameters: function () { return [{ type: i0.ElementRef }, { type: i0.NgZone }, { type: undefined, decorators: [{
+                    }, styles: [":host{display:block;min-height:50px}\n", ".captchala-mount{width:100%}\n", ":host(.captchala-container--bind){min-height:0;position:absolute;width:0;height:0;overflow:hidden}\n"] }]
+        }], ctorParameters: function () { return [{ type: i0.NgZone }, { type: undefined, decorators: [{
                     type: Inject,
                     args: [PLATFORM_ID]
                 }] }]; }, propDecorators: { appKey: [{
@@ -321,6 +320,9 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.2.12", ngImpo
                 type: Output
             }], ready: [{
                 type: Output
+            }], mount: [{
+                type: ViewChild,
+                args: ['mount', { static: true }]
             }] } });
 
 function normalizeError(err) {

@@ -1,4 +1,4 @@
-import { AfterViewInit, ElementRef, EventEmitter, NgZone, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { AfterViewInit, EventEmitter, NgZone, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import type { CaptchalaInstance, CaptchalaProduct, CaptchalaResult, CaptchalaServerTokenHandler } from './types';
 import * as i0 from "@angular/core";
 /**
@@ -8,11 +8,10 @@ import * as i0 from "@angular/core";
  * <captchala appKey="your-app-key" (success)="onSuccess($event)" (error)="onError($event)" />
  * ```
  *
- * The host element is the mount point. Nothing is rendered on the server; the SDK
+ * Nothing but an empty container is rendered on the server; the SDK
  * is loaded from the CDN when the component first renders in the browser.
  */
 export declare class CaptchalaComponent implements AfterViewInit, OnChanges, OnDestroy {
-    private readonly host;
     private readonly zone;
     /** Your public CaptchaLa app key. */
     appKey: string;
@@ -48,13 +47,14 @@ export declare class CaptchalaComponent implements AfterViewInit, OnChanges, OnD
     readonly close: EventEmitter<void>;
     /** The widget is ready. */
     readonly ready: EventEmitter<void>;
+    private mount;
     private instance;
     private viewReady;
     private destroyed;
     private initSeq;
     private reinitTimer;
     private readonly isBrowser;
-    constructor(host: ElementRef<HTMLElement>, zone: NgZone, platformId: object);
+    constructor(zone: NgZone, platformId: object);
     ngAfterViewInit(): void;
     ngOnChanges(changes: SimpleChanges): void;
     ngOnDestroy(): void;

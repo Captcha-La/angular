@@ -11,7 +11,8 @@ import {
   OnDestroy,
   Output,
   PLATFORM_ID,
-  SimpleChanges
+  SimpleChanges,
+  ViewChild
 } from '@angular/core'
 import { isPlatformBrowser } from '@angular/common'
 import { loadCaptchalaSDK } from './loader'
@@ -37,13 +38,14 @@ function hasListeners(emitter: EventEmitter<any>): boolean {
  * <captchala appKey="your-app-key" (success)="onSuccess($event)" (error)="onError($event)" />
  * ```
  *
- * The host element is the mount point. Nothing is rendered on the server; the SDK
+ * Nothing but an empty container is rendered on the server; the SDK
  * is loaded from the CDN when the component first renders in the browser.
  */
 @Component({
   selector: 'captchala',
   standalone: true,
-  template: '',
+  // The SDK mounts into a plain <div> so it can render in its own shadow root.
+  template: '<div #mount class="captchala-mount"></div>',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'captchala-container',
@@ -51,6 +53,7 @@ function hasListeners(emitter: EventEmitter<any>): boolean {
   },
   styles: [
     ':host{display:block;min-height:50px}',
+    '.captchala-mount{width:100%}',
     ':host(.captchala-container--bind){min-height:0;position:absolute;width:0;height:0;overflow:hidden}'
   ]
 })
@@ -91,6 +94,8 @@ export class CaptchalaComponent implements AfterViewInit, OnChanges, OnDestroy {
   /** The widget is ready. */
   @Output() readonly ready = new EventEmitter<void>()
 
+  @ViewChild('mount', { static: true }) private mount!: ElementRef<HTMLDivElement>
+
   private instance: CaptchalaInstance | null = null
   private viewReady = false
   private destroyed = false
@@ -99,7 +104,6 @@ export class CaptchalaComponent implements AfterViewInit, OnChanges, OnDestroy {
   private readonly isBrowser: boolean
 
   constructor(
-    private readonly host: ElementRef<HTMLElement>,
     private readonly zone: NgZone,
     @Inject(PLATFORM_ID) platformId: object
   ) {
@@ -184,7 +188,7 @@ export class CaptchalaComponent implements AfterViewInit, OnChanges, OnDestroy {
       await this.zone.runOutsideAngular(() => loadCaptchalaSDK())
       if (this.destroyed || seq !== this.initSeq) return
       const Captchala = (window as any).Captchala
-      const el = this.host.nativeElement
+      const el = this.mount?.nativeElement
       if (!Captchala || !el) return
 
       this.zone.runOutsideAngular(() => {
