@@ -1,0 +1,6 @@
+# Publish from dist/ (npm publish dist)
+src/
+example/
+node_modules/
+tsconfig.json
+ng-package.json
